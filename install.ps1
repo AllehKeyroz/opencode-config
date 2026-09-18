@@ -50,6 +50,16 @@ Merge-Dir (Join-Path $Repo "config") $ConfigDir "config"
 Merge-Dir (Join-Path $Repo "dot-opencode") $DotOpenCodeDir "dot-opencode"
 Merge-Dir (Join-Path $Repo "skills") $SkillsDir "skills"
 
+# Copia o .env de exemplo se ainda nao existir
+$EnvExample = Join-Path $Repo ".env.example"
+$EnvFile = Join-Path $ConfigDir ".env"
+if ((Test-Path -LiteralPath $EnvExample) -and -not (Test-Path -LiteralPath $EnvFile)) {
+    Copy-Item -LiteralPath $EnvExample -Destination $EnvFile
+    Write-Host "  criado $EnvFile (preencha as chaves reais)" -ForegroundColor Yellow
+} elseif (Test-Path -LiteralPath $EnvFile) {
+    Write-Host "  $EnvFile ja existe - mantido" -ForegroundColor DarkGray
+}
+
 if ($InstallDeps) {
     Write-Host "`n==> Instalando dependencias" -ForegroundColor Cyan
     Push-Location $ConfigDir
@@ -78,7 +88,8 @@ if ($InstallDeps) {
 }
 
 Write-Host "`n==> Proximos passos" -ForegroundColor Cyan
-Write-Host "1. Copie .env.example para $ConfigDir\.env e preencha as chaves reais."
-Write-Host "2. Ajuste caminhos com C:\Users\User\ se o usuario for diferente."
-Write-Host "3. Reinicie o OpenCode."
+Write-Host "1. Edite $ConfigDir\.env e preencha as chaves reais (NINE_ROUTER_API_KEY, GHL_PIT_TOKEN, ...)."
+Write-Host "2. Se quiser instalar as dependencias agora: .\install.ps1 -InstallDeps"
+Write-Host "3. Ajuste caminhos com C:\Users\User\ se o usuario for diferente."
+Write-Host "4. Reinicie o OpenCode."
 Write-Host "`nConcluido." -ForegroundColor Green
