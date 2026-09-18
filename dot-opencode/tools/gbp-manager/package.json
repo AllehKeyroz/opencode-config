@@ -1,0 +1,14 @@
+{
+  "name": "gbp-manager",
+  "version": "1.0.0",
+  "description": "Tool para gerenciamento do Google Business Profile via API oficial",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "googleapis": "^140.0.0",
+    "axios": "^1.7.0"
+  },
+  "bin": {
+    "gbp": "./index.js"
+  }
+}

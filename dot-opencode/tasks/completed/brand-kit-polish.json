@@ -1,0 +1,43 @@
+{
+  "id": "brand-kit-polish",
+  "title": "Brand Identity - Refinar e HTML",
+  "instructions": "Com base no Brand Identity Kit ja criado em C:\\KEYROZ DIGITAL SOLUTIONS\\Brand Identity\\, refinar os entregaveis e criar versoes HTML profissionais.
+
+OBSERVACOES DA REVISAO ANTERIOR:
+- brand-identity.md: revisar acentuacao, adicionar clamp() para tipografia fluida
+- palette.css: adicionar --color-surface-inset e --color-surface-elevated (escuridao extra)
+- typography.css: adicionar clamp() nos h1-h6, font-family mais robusta (Inter -> Inter, 'Inter Variable', system-ui)
+- logo-concept.svg: aumentar stroke, ajustar viewBox pra nao cortar
+
+ENTREGAVEIS:
+1. 'brand-kit\\brand-identity.html' — Documento completo em HTML com CSS embutido, visual escuro premium, tipografia elegante. Deve ser BONITO de verdade — como se fosse uma apresentacao de branding de agencia.
+
+2. Refinar os arquivos existentes com as correcoes acima
+
+3. Abra o html no navegador com Playwright ao final para screenshot como prova
+
+PRAZO: 10 minutos
+DIRETORIO: C:\\KEYROZ DIGITAL SOLUTIONS\\Brand Identity\\
+SUPERVISOR: Agendar a execucao com schtasks ONCE 2min, confirmar, mover para completed, encerrar.",
+  "status": "pending",
+  "mode": "clean",
+  "supervisorSession": "ses_0fb131f3cffe5o9Wiq2ZHztsgx",
+  "contextMessages": 60,
+  "createdAt": "2026-06-26T23:40:00",
+  "executionSessionId": "ses_0f90c37c3ffeoTjuJhQ9crYtx8",
+  "executedAt": "2026-06-26T23:48:00",
+  "difficulties": [
+    {
+      "issue": "Playwright bloqueia acesso ao protocolo file:// para abrir HTML local",
+      "resolution": "Iniciado servidor HTTP local (Python http.server na porta 8999) para servir o arquivo HTML"
+    },
+    {
+      "issue": "Logo SVG precisou de reajuste completo de coordenadas apos aumento do viewBox de 600x200 para 640x240",
+      "resolution": "Recalculadas todas as coordenadas dos elementos graficos (linhas, circulos, textos) para o novo viewBox, mantendo proporcoes e centralizacao"
+    },
+    {
+      "issue": "Fonte 'Inter Variable' nao estava na font stack original",
+      "resolution": "Adicionada 'Inter Variable' apos Inter na font-family dos headings, mantendo fallback para -apple-system, BlinkMacSystemFont, etc."
+    }
+  ]
+}

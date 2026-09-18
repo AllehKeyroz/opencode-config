@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Segredos e dados sensiveis (NUNCA versionar)
+secrets/
+.env
+.env.*
+!.env.example
+antigravity-accounts.json
+antigravity-signature-cache.json
+antigravity-logs/
+
+# Runtime / cache / lixo
+browser-profile/
+generated-images/
+generated-image-sessions/
+*.log
+*.tmp
+ctx_*.json
+*.pyc
+__pycache__/
