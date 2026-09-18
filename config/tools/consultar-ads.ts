@@ -3,7 +3,7 @@ import { execSync } from "child_process"
 import { existsSync, mkdirSync, writeFileSync } from "fs"
 import { join } from "path"
 
-const SCRIPT = "C:\\KEYROZ DIGITAL SOLUTIONS\\Agents skills\\Gestor de tráfego Dtalia Pizzaria\\consultar_ads.py"
+const SCRIPT = process.env.CONSULTAR_ADS_SCRIPT ?? ""
 
 export default tool("consultar-ads", {
   description: "Consulta a Biblioteca de Anúncios do Meta (Meta Ads Library) via navegador headless. Pesquisa anúncios ativos/inativos de qualquer anunciante ou palavra-chave e extrai dados estruturados (ID, página, status, texto, link, CTA, tipo).",
@@ -15,6 +15,7 @@ export default tool("consultar-ads", {
     required: ["termo"]
   }
 }, async ({ termo }: { termo: string }) => {
+  if (!SCRIPT) return "Erro: defina a variavel de ambiente CONSULTAR_ADS_SCRIPT com o caminho do script consultar_ads.py"
   const outDir = join(process.env.USERPROFILE!, "Documents", "consultas-ads")
   mkdirSync(outDir, { recursive: true })
 

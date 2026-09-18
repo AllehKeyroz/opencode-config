@@ -13,9 +13,7 @@
     "skill": "allow",
     "lsp": "allow",
     "external_directory": {
-      "~/.opencode/tasks/**": "allow",
-      "C:\\KEYROZ DIGITAL SOLUTIONS\\KDS KIT": "allow",
-      "C:\\KEYROZ DIGITAL SOLUTIONS\\KDS KIT\\**": "allow"
+      "~/.opencode/tasks/**": "allow"
     }
   },
   "lsp": true,

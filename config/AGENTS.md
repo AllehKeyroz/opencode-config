@@ -47,7 +47,7 @@ A ferramenta `generate-diagram` esta disponivel para criar diagramas visuais edi
 ### Fluxo
 1. Identifique a necessidade de um diagrama (ex: explicar fluxo, mostrar dados)
 2. Use `generate-diagram` com o tipo adequado
-3. O arquivo `.excalidraw` sera criado em `C:\KEYROZ DIGITAL SOLUTIONS\Marketing\Visuals\`
+3. O arquivo `.excalidraw` sera criado em `~/Documents/Excalidraw/` (ou no `outDir` informado)
 4. Informe o usuario que pode abrir com duplo clique no VS Code
 
 ### Regras IMPORTANTES ao usar

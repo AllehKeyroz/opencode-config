@@ -69,4 +69,5 @@ cd $env:USERPROFILE\.opencode\tools\gbp-manager; npm install
 
 1. **Caminhos dinâmicos**: os caminhos de usuário usam `{env:USERPROFILE}` (Playwright) e caminho relativo (plugin antigravity), então funcionam em qualquer máquina/nome de usuário sem ajuste manual. Requer que a variável de ambiente `USERPROFILE` esteja definida (padrão em qualquer Windows).
 2. **`opencode.json` vs `opencode.jsonc`**: ambos existem na pasta config. O OpenCode prioriza um deles — se o provider 9router não aparecer, verifique qual está sendo carregado.
-3. **`consultar-ads.ts`** referencia um script Python externo (`C:\KEYROZ DIGITAL SOLUTIONS\Agents skills\...\consultar_ads.py`) que não está versionado aqui.
+3. **`consultar-ads.ts`** depende de um script Python externo. Configure a variável de ambiente `CONSULTAR_ADS_SCRIPT` com o caminho do `consultar_ads.py` (o script em si não está versionado aqui).
+4. **`generate-diagram.ts`** salva em `~/Documents/Excalidraw/` por padrão. Sobrescreva com a variável `EXCALIDRAW_OUTPUT_DIR` ou o argumento `outDir`.

@@ -60,7 +60,7 @@ export default tool({
     outDir: tool.schema.string().optional(),
   },
   async execute(args) {
-    const outDir = args.outDir || "C:\\KEYROZ DIGITAL SOLUTIONS\\Marketing\\Visuals"
+    const outDir = args.outDir || process.env.EXCALIDRAW_OUTPUT_DIR || join(process.env.USERPROFILE || process.env.HOME || ".", "Documents", "Excalidraw")
     mkdirSync(outDir, { recursive: true })
     const W = args.width || 900
     const _H = args.height || 700
