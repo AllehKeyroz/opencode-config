@@ -40,23 +40,6 @@ function Merge-Dir([string]$Source, [string]$Dest, [string]$Label) {
     if ($LASTEXITCODE -ge 8) { throw "robocopy falhou ($LASTEXITCODE) para $Label" }
 }
 
-function Fix-UserPaths([string]$Dir) {
-    if (-not (Test-Path -LiteralPath $Dir)) { return }
-    $profile = $env:USERPROFILE
-    $profileEsc = $profile.Replace('\', '\\')
-    $utf8 = New-Object System.Text.UTF8Encoding($false)
-    Get-ChildItem -LiteralPath $Dir -Recurse -File |
-        Where-Object { $_.Extension -in '.json', '.jsonc', '.md', '.ts', '.js', '.ps1' } |
-        ForEach-Object {
-            $raw = [System.IO.File]::ReadAllText($_.FullName)
-            $new = $raw.Replace('C:\\Users\\User', $profileEsc).Replace('C:\Users\User', $profile)
-            if ($new -ne $raw) {
-                [System.IO.File]::WriteAllText($_.FullName, $new, $utf8)
-                Write-Host "    caminhos ajustados em: $($_.Name)" -ForegroundColor DarkGray
-            }
-        }
-}
-
 Write-Host "`n==> Instalando OpenCode Config (Keyroz)" -ForegroundColor Cyan
 
 Backup-Dir $ConfigDir
@@ -66,11 +49,6 @@ Backup-Dir $SkillsDir
 Merge-Dir (Join-Path $Repo "config") $ConfigDir "config"
 Merge-Dir (Join-Path $Repo "dot-opencode") $DotOpenCodeDir "dot-opencode"
 Merge-Dir (Join-Path $Repo "skills") $SkillsDir "skills"
-
-# Ajusta caminhos hardcoded (C:\Users\User) para o usuario atual
-Write-Host "`n==> Ajustando caminhos de usuario" -ForegroundColor Cyan
-Fix-UserPaths $ConfigDir
-Fix-UserPaths $DotOpenCodeDir
 
 # Copia o .env de exemplo se ainda nao existir
 $EnvExample = Join-Path $Repo ".env.example"
