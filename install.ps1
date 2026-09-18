@@ -40,6 +40,23 @@ function Merge-Dir([string]$Source, [string]$Dest, [string]$Label) {
     if ($LASTEXITCODE -ge 8) { throw "robocopy falhou ($LASTEXITCODE) para $Label" }
 }
 
+function Fix-UserPaths([string]$Dir) {
+    if (-not (Test-Path -LiteralPath $Dir)) { return }
+    $profile = $env:USERPROFILE
+    $profileEsc = $profile.Replace('\', '\\')
+    $utf8 = New-Object System.Text.UTF8Encoding($false)
+    Get-ChildItem -LiteralPath $Dir -Recurse -File |
+        Where-Object { $_.Extension -in '.json', '.jsonc', '.md', '.ts', '.js', '.ps1' } |
+        ForEach-Object {
+            $raw = [System.IO.File]::ReadAllText($_.FullName)
+            $new = $raw.Replace('C:\\Users\\User', $profileEsc).Replace('C:\Users\User', $profile)
+            if ($new -ne $raw) {
+                [System.IO.File]::WriteAllText($_.FullName, $new, $utf8)
+                Write-Host "    caminhos ajustados em: $($_.Name)" -ForegroundColor DarkGray
+            }
+        }
+}
+
 Write-Host "`n==> Instalando OpenCode Config (Keyroz)" -ForegroundColor Cyan
 
 Backup-Dir $ConfigDir
@@ -49,6 +66,11 @@ Backup-Dir $SkillsDir
 Merge-Dir (Join-Path $Repo "config") $ConfigDir "config"
 Merge-Dir (Join-Path $Repo "dot-opencode") $DotOpenCodeDir "dot-opencode"
 Merge-Dir (Join-Path $Repo "skills") $SkillsDir "skills"
+
+# Ajusta caminhos hardcoded (C:\Users\User) para o usuario atual
+Write-Host "`n==> Ajustando caminhos de usuario" -ForegroundColor Cyan
+Fix-UserPaths $ConfigDir
+Fix-UserPaths $DotOpenCodeDir
 
 # Copia o .env de exemplo se ainda nao existir
 $EnvExample = Join-Path $Repo ".env.example"
@@ -90,6 +112,5 @@ if ($InstallDeps) {
 Write-Host "`n==> Proximos passos" -ForegroundColor Cyan
 Write-Host "1. Edite $ConfigDir\.env e preencha as chaves reais (NINE_ROUTER_API_KEY, GHL_PIT_TOKEN, ...)."
 Write-Host "2. Se quiser instalar as dependencias agora: .\install.ps1 -InstallDeps"
-Write-Host "3. Ajuste caminhos com C:\Users\User\ se o usuario for diferente."
-Write-Host "4. Reinicie o OpenCode."
+Write-Host "3. Reinicie o OpenCode."
 Write-Host "`nConcluido." -ForegroundColor Green

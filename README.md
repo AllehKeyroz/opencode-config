@@ -67,6 +67,6 @@ cd $env:USERPROFILE\.opencode\tools\gbp-manager; npm install
 
 ## Avisos
 
-1. **Caminhos absolutos**: `opencode.jsonc` contém paths com `C:\Users\User\`. Se o usuário do Windows for diferente, ajuste antes de usar.
+1. **Caminhos de usuário**: o `install.ps1` substitui automaticamente `C:\Users\User` pelo usuário real da máquina (ex: `C:\Users\Alessandro`) nos arquivos de config. Se copiar os arquivos manualmente (sem o script), ajuste esses caminhos à mão.
 2. **`opencode.json` vs `opencode.jsonc`**: ambos existem na pasta config. O OpenCode prioriza um deles — se o provider 9router não aparecer, verifique qual está sendo carregado.
 3. **`consultar-ads.ts`** referencia um script Python externo (`C:\KEYROZ DIGITAL SOLUTIONS\Agents skills\...\consultar_ads.py`) que não está versionado aqui.
