@@ -331,16 +331,6 @@
   },
   "plugin": [
     "opencode-antigravity-auth",
-    "C:\\Users\\User\\.config\\opencode\\plugins\\opencode-antigravity-image\\dist\\index.js",
-    "./plugins/quota-provider.js",
-    "./plugins/keyroz/plugin.js",
-    "C:/Users/User/.config/opencode/plugins/opencode-nordy-auth/dist/index.js",
-    "C:/Users/User/.config/opencode/plugins/opencode-comet-auth/dist/index.js"
-  ],
-  "command": {
-    "quota": {
-      "template": "Check all connected AI provider quotas using the check_quotas tool and show me the results. If there's cached data, use it. Responda em português.",
-      "description": "Show usage quotas for all connected providers"
-    }
-  }
+    "C:\\Users\\User\\.config\\opencode\\plugins\\opencode-antigravity-image\\dist\\index.js"
+  ]
 }

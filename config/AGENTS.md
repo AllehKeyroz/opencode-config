@@ -1,15 +1,4 @@
-﻿# Global Rules
-
-## Clipboard Image
-
-Quando o usuario tentar colar uma imagem que voce nao consegue ver (erro "Cannot read clipboard"), use a ferramenta `clipboard-image` para salvar a imagem da area de transferencia em um arquivo temporario. Depois, invoque o subagente `vision` (Kimi K2.7 Code, modelo `opencode-go/kimi-k2.7-code`) passando o caminho do arquivo para processar a imagem com visao nativa.
-
-Fluxo:
-1. Chame `clipboard-image` â†’ retorna o caminho da imagem salva
-2. Invoque `task` com `subagent_type: "vision"` passando o caminho da imagem
-3. Entregue o resultado da analise ao usuario
-
-Isso funciona em QUALQUER conversa, independente do modelo principal.
+# Global Rules
 
 ## Geracao de Imagens
 
@@ -181,88 +170,6 @@ do usuario e seus aprendizados.
 4. **Sem subgraphs** â€” fluxo plano
 5. **Layout**: `graph TD` (top-down)
 6. **Acentos preservados** (UTF-8)
-
-## Task System (Tarefas Agendadas)
-
-O usuario pode criar tarefas que sao disparadas automaticamente pelo Windows Task Scheduler.
-Quando o horario chega, o scheduler abre um **novo terminal com OpenCode** e ja envia o comando `#task <id>` como primeira mensagem.
-
-### Estrutura
-- `C:\Users\User\.opencode\tasks\tasks.json` â€” registro mestre de todas as tarefas
-- `C:\Users\User\.opencode\tasks\pending\*.json` â€” tarefas aguardando execucao (ja existem desde a criacao)
-- `C:\Users\User\.opencode\tasks\completed\*.json` â€” tarefas concluidas
-- `C:\Users\User\.opencode\scripts\trigger-task.ps1` â€” script que dispara a task
-
-### Gatilho
-Quando o scheduler dispara, o script `trigger-task.ps1`:
-1. Le o pending file (instrucoes)
-2. Abre TUI com `opencode --prompt "#task <task-id>"` â€” sessao nova, sem fork, sem pynput
-3. O `--prompt` ja preenche o input e envia o comando automaticamente
-4. O comando chega na conversa como primeira mensagem
-
-### Regra ABSOLUTA (nunca quebrar)
-O supervisor **NUNCA** pode encerrar uma revisao sem criar a proxima task. Toda task que chega pra revisao gera obrigatoriamente uma nova task â€” seja de ajuste, de melhoria, ou de avanco pro proximo passo. So pare quando houver uma task agendada para o task-runner seguinte.
-
-### Padrao de qualidade (seja IMPLACAVEL)
-Ao revisar entregaveis, nao se limite a ler o codigo/arquivo. Use ferramentas VISUAIS:
-- Playwright para abrir HTML e ver como realmente fica
-- Screenshots para inspecionar visualmente
-- Windows-MCP para navegar no explorador de arquivos
-- Nao aprove nada so porque "parece certo" â€” abra, veja, critique
-
-Seu padrao deve ser de agencia premium: design impecavel, codigo limpo, sem "jeitinho". Uma logo ruim, um CSS mal feito, um SVG cortado = reprovado na hora. O task-runner que se vire pra produzir com qualidade.
-
-### Comportamento do agente (voce)
-Quando receber uma mensagem comeÃ§ando com `#task <id>`:
-1. Leia o arquivo em `pending/<id>.json` (contem `instructions` + opcional `contextSession`)
-2. Se tiver `contextSession`, exporte o contexto:
-   ```bash
-   opencode db "SELECT data FROM message WHERE session_id = '<id>' ORDER BY rowid DESC LIMIT <N>"
-   ```
-   Use `contextMessages: N` se especificado, ou `LIMIT 50` como padrao. Isso e MUITO mais barato que exportar a conversa inteira.
-3. Leia o resultado para obter as ultimas N mensagens da conversa original
-4. RENOMEIE a sessao para identificar quem trabalhou:
-   ```bash
-   opencode db "UPDATE session SET title = '[supervisor] <id-da-task>' WHERE id = '<sessionAtual>'"
-   ```
-5. Execute as instrucoes com o contexto carregado
-6. Use ferramentas disponiveis (Playwright, Windows-MCP, etc.) para cumprir a tarefa
-7. Se a task for um **projeto** (ex: criar site, app, sistema), o supervisor (eu) DEVE:
-   - Criar a estrutura de pastas em `~/.opencode/projects/<projeto>/` com subpastas `references/`, `docs/`, `designs/`, `src/`
-   - Incluir nas instrucoes das tasks filhas que arquivos devem ser salvos dentro dessa estrutura
-8. Se a task tiver `supervisorSession`, ao concluir a execucao o agente task-runner DEVE:
-   a) Criar a proxima task em `pending/` (revisao ou continuacao)
-   b) **AGENDAR via schtasks ONCE** (2min a partir de agora):
-   ```powershell
-   $proximo = (Get-Date).AddMinutes(2).ToString("HH:mm")
-   schtasks /Create /TN "OpenCode\<task-id>" /TR "powershell -ExecutionPolicy Bypass -File 'C:\Users\User\.opencode\scripts\trigger-task.ps1' -TaskId <task-id>" /SC ONCE /ST $proximo /F
-   ```
-   c) CONFIRMAR que foi agendado (`schtasks /Query /TN "OpenCode\<task-id>"`)
-   d) So entao mover o pending original para completed/
-   e) A task agendada abre o supervisor (eu) que analisa e decide o proximo passo
-
-9. Ao concluir, **adicione os campos de auditoria** no JSON antes de mover:
-   - `executionSessionId`: o session ID da sessao que executou a task
-   - `executedAt`: timestamp de conclusao
-   - `difficulties`: array de objetos com `issue` + `resolution` descrevendo problemas encontrados e como resolveu
-10. Mova o arquivo de `pending/` para `completed/`
-11. Atualize o status no `tasks.json`
-12. Informe o usuario sobre o resultado â€” resumo do que fez, o que foi agendado, e encerre
-
-### Criar nova tarefa
-Se o usuario pedir para criar uma tarefa agendada, **pergunte** se quer executar na sessao atual (`mode: "resume"`) ou numa sessao nova (`mode: "clean"`, **padrao** â€” o usuario prefere sempre sessao nova).
-1. Pegue o session ID atual: `opencode session list --format json -n 1` (guarde o `id` e o `directory`)
-2. Adicione a task no array `tasks` de `tasks.json` incluindo `sessionId`, `directory`, `mode` e `contextSession`
-3. Crie o `.json` em `pending/` com as instrucoes, `sessionId`, `directory`, `mode` e `contextSession`
-4. Crie o agendamento com PowerShell cmdlets (suporta WakeToRun):
-
-```powershell
-$action = New-ScheduledTaskAction -Execute "powershell" -Argument "-ExecutionPolicy Bypass -File `"C:\Users\User\.opencode\scripts\trigger-task.ps1`" -TaskId <task-id>"
-$trigger = New-ScheduledTaskTrigger -Daily -At "13:00"  # ou -Once
-$settings = New-ScheduledTaskSettingsSet -WakeToRun -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive
-Register-ScheduledTask -TaskName "<task-id>" -TaskPath "\OpenCode\" -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force
-```
 
 <claude-mem-context>
 # Memory Context from Past Sessions
